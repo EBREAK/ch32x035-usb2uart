@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 extern void log_init(void);
 extern void log_putc(char c);
 extern void log_puts(char *s);

@@ -16,9 +16,9 @@ STARTUP_SCRIPT ?=  startup_ch32x035.S
 SRCS += \
 	$(CH32X035_SDK)/SRC/Peripheral/src/ch32x035_rcc.c \
 	$(CH32X035_SDK)/SRC/Peripheral/src/ch32x035_gpio.c \
-	$(CH32X035_SDK)/SRC/Peripheral/src/ch32x035_pwr.c \
 	$(CH32X035_SDK)/SRC/Peripheral/src/ch32x035_usart.c \
 	$(CH32X035_SDK)/SRC/Peripheral/src/ch32x035_misc.c \
+	$(CH32X035_SDK)/SRC/Peripheral/src/ch32x035_dma.c \
 	$(CH32X035_SDK)/SRC/Core/core_riscv.c \
 
 INCS += \
@@ -34,7 +34,7 @@ CFLAGS += \
 	-Wno-pointer-to-int-cast \
 	-Wno-discarded-qualifiers \
 	-Xlinker --gc-sections \
-	-march=rv32imacf_zicsr_zifencei -mabi=ilp32 \
+	-march=rv32imac_zicsr_zifencei -mabi=ilp32 \
 	-Os -ggdb \
 	-nostartfiles \
 	-T $(LINK_SCRIPT) \
@@ -43,7 +43,12 @@ SRCS += \
 	ch32x035_it.c  \
 	system_ch32x035.c \
 	chip.c \
+	ticks.c \
+	pwr.c \
 	log.c \
+	usbfsd.c \
+	usbfsd_data.S \
+	uart.c \
 	main.c \
 
 INCS += \
@@ -51,7 +56,7 @@ INCS += \
 
 all:
 	$(CC) $(CFLAGS) $(STARTUP_SCRIPT) $(INCS) $(SRCS) -o $(FW_NAME).elf
-	$(OD) -l -F -S -d $(FW_NAME).elf > $(FW_NAME).dis
+	$(OD) -d $(FW_NAME).elf > $(FW_NAME).dis
 	$(OC) -O ihex $(FW_NAME).elf $(FW_NAME).hex
 	$(OC) -O binary $(FW_NAME).elf $(FW_NAME).bin
 	$(SZ) $(FW_NAME).elf
@@ -61,3 +66,6 @@ ocd:
 
 db:
 	$(DB) $(FW_NAME).elf
+
+flash:
+	wlink flash $(FW_NAME).bin
